@@ -96,7 +96,7 @@ backend-turnos-reservas/
 
 ## Checklist del curso
 
-- [x] Semana 1 - Recorrido por Node.js y estructura inicial
+- [ ] Semana 1 - Recorrido por Node.js y estructura inicial
 - [ ] Semana 2 - Express y API REST
 - [ ] Semana 3 - FileSystem
 - [ ] Semana 4 - Routers y controllers
