@@ -1,20 +1,18 @@
-import http from 'http';
-
-import { config } from './config/config.js';
+import {config} from './config/config.js';
+import app from "./app.js";
 
 const port = config.PORT;
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, {'Content-Type': 'application/json'});
-
-    const response = {
-        message: 'Bienvenido al backend del sistema de turnos y reservas ',
-        status: 200,
+(async () => {
+    try {
+        app.listen(port, () => {
+            console.log(`Server started on port ${port}`);
+        }).on('error', (err) => {
+            console.error(`Error init server: ${err.message}`);
+            process.exit(1);
+        })
+    } catch (err) {
+        console.error(`API can't start - ${err.message}`);
     }
-    res.end(JSON.stringify(response));
-})
-
-server.listen(port, () => {
-    console.log(`Server started on port ${port}, Bienvenidos a ${config.APP_NAME}`);
-})
+})();
 
