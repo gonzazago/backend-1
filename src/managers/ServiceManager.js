@@ -1,5 +1,3 @@
-
-
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,8 +7,19 @@ const __dirname = path.dirname(__filename);
 const DEFAULT_PATH = path.resolve(__dirname, '../data/data.json');
 
 export class ServiceManager {
+
     constructor(filePath = DEFAULT_PATH) {
         this.path = filePath;
+    }
+
+    handleError(error, statusCode = 500) {
+        const message = error instanceof Error ? error.message : String(error);
+        const newError = new Error(message);
+        newError.statusCode = statusCode;
+        if (error instanceof Error && error.stack) {
+            newError.stack = error.stack;
+        }
+        return newError;
     }
 
     // Toda la lista de servicios
@@ -23,81 +32,114 @@ export class ServiceManager {
                 await fs.writeFile(this.path, JSON.stringify([], null, 2), 'utf-8');
                 return [];
             }
-            throw new Error(`Error al leer los servicios: ${error.message}`);
+            throw this.handleError(`Error al leer los servicios: ${error.message}`, 500);
         }
     }
 
     // Un servicio por id
     async getServiceById(id) {
+        if (!id || String(id).trim() === '') {
+            throw this.handleError('El ID del servicio es requerido', 400);
+        }
+
         const services = await this.getServices();
         const service = services.find((s) => String(s.id) === String(id));
         if (!service) {
-            throw new Error(`Servicio con ID ${id} no encontrado`);
+            throw this.handleError(`Servicio con ID ${id} no encontrado`, 404);
         }
         return service;
     }
 
     // Agrega un servicio nuevo
     async addService(serviceData) {
-        const { name, description, duration, price, category, available = true } = serviceData;
+        const { name, description, duration, price, category, available = true } = serviceData || {};
 
         if (!name || !description || duration === undefined || price === undefined || !category) {
-            throw new Error('Todos los campos son obligatorios (name, description, duration, price, category)');
+            throw this.handleError(
+                'Todos los campos son obligatorios (name, description, duration, price, category)',
+                400
+            );
         }
 
-        const services = await this.getServices();
+        try {
+            const services = await this.getServices();
 
-        // Generar ID incremental único
-        const maxId = services.reduce((max, s) => {
-            const numId = Number(s.id);
-            return !isNaN(numId) && numId > max ? numId : max;
-        }, 0);
-        const newId = String(maxId + 1);
+            // Generar ID incremental único
+            const maxId = services.reduce((max, s) => {
+                const numId = Number(s.id);
+                return !isNaN(numId) && numId > max ? numId : max;
+            }, 0);
+            const newId = String(maxId + 1);
 
-        const newService = {
-            id: newId,
-            name: String(name).trim(),
-            description: String(description).trim(),
-            duration: Number(duration),
-            price: Number(price),
-            category: String(category).trim(),
-            available: Boolean(available),
-        };
+            const newService = {
+                id: newId,
+                name: String(name).trim(),
+                description: String(description).trim(),
+                duration: Number(duration),
+                price: Number(price),
+                category: String(category).trim(),
+                available: Boolean(available),
+            };
 
-        services.push(newService);
-        await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
-        return newService;
+            services.push(newService);
+            await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
+            return newService;
+        } catch (error) {
+            if (error.statusCode) throw error;
+            throw this.handleError(`Error al agregar el servicio: ${error.message}`, 500);
+        }
     }
 
     // Actualiza un servicio
     async updateService(id, updatedData) {
-        const services = await this.getServices();
-        const index = services.findIndex((s) => String(s.id) === String(id));
-        if (index === -1) {
-            throw new Error(`Servicio con ID ${id} no encontrado`);
+        if (!id || String(id).trim() === '') {
+            throw this.handleError('El ID del servicio es requerido', 400);
+        }
+        if (!updatedData || Object.keys(updatedData).length === 0) {
+            throw this.handleError('Debe enviar los datos a actualizar en el cuerpo de la petición', 400);
         }
 
-        services[index] = {
-            ...services[index],
-            ...updatedData,
-            id: services[index].id, // preserva el id original
-        };
+        try {
+            const services = await this.getServices();
+            const index = services.findIndex((s) => String(s.id) === String(id));
+            if (index === -1) {
+                throw this.handleError(`Servicio con ID ${id} no encontrado`, 404);
+            }
 
-        await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
-        return services[index];
+            services[index] = {
+                ...services[index],
+                ...updatedData,
+                id: services[index].id, // preserva el id original
+            };
+
+            await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
+            return services[index];
+        } catch (error) {
+            if (error.statusCode) throw error;
+            throw this.handleError(`Error al actualizar el servicio: ${error.message}`, 500);
+        }
     }
 
     // Borra un servicio
     async deleteService(id) {
-        const services = await this.getServices();
-        const index = services.findIndex((s) => String(s.id) === String(id));
-        if (index === -1) {
-            throw new Error(`Servicio con ID ${id} no encontrado`);
+        if (!id || String(id).trim() === '') {
+            throw this.handleError('El ID del servicio es requerido', 400);
         }
 
-        const [deletedService] = services.splice(index, 1);
-        await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
-        return deletedService;
+        try {
+            const services = await this.getServices();
+            const index = services.findIndex((s) => String(s.id) === String(id));
+            if (index === -1) {
+                throw this.handleError(`Servicio con ID ${id} no encontrado`, 404);
+            }
+
+            const [deletedService] = services.splice(index, 1);
+            await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
+            return deletedService;
+        } catch (error) {
+            if (error.statusCode) throw error;
+            throw this.handleError(`Error al eliminar el servicio: ${error.message}`, 500);
+        }
     }
 }
 
