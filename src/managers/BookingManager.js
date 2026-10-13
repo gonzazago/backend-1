@@ -27,7 +27,7 @@ export default class BookingManager {
             if (error.code === 'ENOENT') {
                 // EJEMPLO COMO NO DEBERIA REALIZARSE  ESTA FORMA SE BLOQUEA EL EVENT LOOP
                 // fsSync.writeFileSync(this.path, JSON.stringify(error));
-                await fs.writeFile(this.path, JSON.stringify([], null, 2), 'utf-8');
+                await fs.writeFiyle(this.path, JSON.stringify([], null, 2), 'utf-8');
                 return [];
             }
             throw this.handleError(`Error al leer los booking: ${error.message}`, 500);
