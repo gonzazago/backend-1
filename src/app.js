@@ -1,34 +1,28 @@
+import packageJson from '../package.json' with { type: 'json' };
 import express from 'express';
-import servicesRouter from './routes/services.router.js';
+import serviceRouter from './router/service.router.js';
+import path from "path";
+import {fileURLToPath} from "url";
+import bookingRouter from "./router/booking.router.js";
+
+export const { name, version, description, author, license } = packageJson;
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log( __dirname )
+
+// Middlewares para parsear cuerpos de peticiones
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
+// Rutas
+app.get('/health', (req, res) => {
+    res.status(200).json({ name, version, status: 'OK' });
 });
 
-app.get('/', (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        message: 'Bienvenido al backend del sistema de turnos y reservas',
-    });
-});
-
-app.use('/api/services', servicesRouter);
-
-app.use((req, res) => {
-    res.status(404).json({ status: 'error', message: `Ruta ${req.method} ${req.url} no encontrada` });
-});
-
-app.use((error, req, res, next) => {
-    if (error.type === 'entity.parse.failed') {
-        return res.status(400).json({ status: 'error', message: 'El body no es un JSON válido' });
-    }
-    console.error(error);
-    res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
-});
+app.use('/api/services', serviceRouter);
+app.use('/api/bookings',bookingRouter);
 
 export default app;

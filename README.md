@@ -1,84 +1,107 @@
 # Sistema backend de turnos y reservas
 
-API REST con Express para gestionar el recurso `services` (servicios que se
-pueden reservar). Los datos se guardan en `src/data/data.json` mediante el
-`ServiceManager`.
+API backend para gestionar servicios y reservas de turnos.
 
-## Requisitos
+---
 
-- Node.js 22 o superior
-- npm
+## Tecnologías
+
+- **Node.js** (v22.x LTS)
+- **Express**
+- **MongoDB Atlas** & **Mongoose**
+- **Socket.io**
+- **Zod**
+- **ES Modules (ESM)** con `import` / `export`
+
+---
+
+## Requisitos previos
+
+- **Node.js** (versión 22 o superior): [Descargar Node.js](https://nodejs.org/en/download)
+  - Seleccionar sistema operativo: macOS (`.pkg`), Linux (`.xz`), Windows (`.exe`)
+- **npm** (incluido con Node.js)
+
+---
 
 ## Instalación
 
+1. Clonar el repositorio o descargar el proyecto.
+2. Instalar las dependencias:
+
 ```bash
 npm install
-cp .env.example .env
-npm run dev
 ```
 
-Por defecto escucha en `http://localhost:8080`.
+---
 
 ## Variables de entorno
 
-| Variable | Descripción | Default |
-| --- | --- | --- |
-| `PORT` | Puerto del servidor | `8080` |
-| `APP_NAME` | Nombre que se muestra al arrancar | `SISTEMA BACKEND DE TURNOS Y RESERVA` |
-| `ENV` | Entorno de ejecución | `DEV` |
-| `MONGO_DB_URI` | URI de MongoDB (se usa más adelante en el curso) | vacío |
+Copiar o renombrar el archivo `.env_template` a `.env` y configurar los valores necesarios:
 
-## Estructura
+```bash
+cp .env_template .env
+```
+
+Ejemplo de configuración en `.env`:
+
+```env
+PORT=8080
+APP_NAME="SISTEMA BACKEND DE TURNOS Y RESERVA"
+ENV=DEV
+MONGO_DB_URI={{mongo_url}}
+```
+
+---
+
+## Scripts disponibles
+
+- **Iniciar en producción / modo estándar:**
+  ```bash
+  npm start
+  ```
+  Ejecuta `node src/server.js`.
+
+- **Iniciar en modo desarrollo (recarga automática):**
+  ```bash
+  npm run dev
+  ```
+  Ejecuta `node --watch src/server.js` para reiniciar el servidor automáticamente ante cambios.
+
+Por defecto, el servidor se iniciará en `http://localhost:8080/`.
+
+---
+
+## Estructura del proyecto
 
 ```text
-src/
-├── config/env.config.js         # Lee el .env con dotenv
-├── data/data.json               # Persistencia en archivo
-├── managers/ServiceManager.js   # Lógica de servicios (leer, filtrar, crear, actualizar, borrar)
-├── routes/services.router.js    # Endpoints de /api/services
-├── app.js                       # Express: middlewares, routers, 404 y errores
-└── server.js                    # Levanta el servidor en el puerto configurado
+backend-turnos-reservas/
+├── .env_template          # Plantilla de variables de entorno
+├── package.json           # Metadatos del proyecto y scripts
+├── README.md              # Documentación del proyecto
+└── src/
+    ├── app.js             # Configuración principal de la aplicación
+    ├── server.js          # Punto de entrada y arranque del servidor HTTP
+    ├── config/            # Configuraciones (base de datos, entorno, etc.)
+    ├── controllers/       # Controladores de peticiones HTTP
+    ├── dao/               # Data Access Objects (capa de persistencia)
+    ├── middlewares/       # Middlewares de Express
+    ├── models/            # Modelos de datos / esquemas de Mongoose
+    ├── repositories/      # Capa de repositorios
+    ├── routes/            # Definición de rutas del sistema
+    ├── services/          # Lógica de negocio
+    └── utils/             # Funciones utilitarias y helpers
 ```
 
-## Endpoints
+---
 
-| Método | Ruta | Respuesta |
-| --- | --- | --- |
-| GET | `/api/services` | 200 con todos los servicios. Filtros: `?category=salud`, `?available=true` |
-| GET | `/api/services/:sid` | 200 si existe, 404 si no |
-| POST | `/api/services` | 201 con el servicio creado (id generado), 400 si faltan campos |
-| PUT | `/api/services/:sid` | 200 con el servicio actualizado (el id no cambia), 404 si no existe |
-| DELETE | `/api/services/:sid` | 200 con el servicio eliminado, 404 si no existe |
+## Checklist del curso
 
-Campos obligatorios en el POST: `name`, `description`, `duration`, `price`,
-`category`. `available` es opcional (default `true`).
-
-Ejemplo de body:
-
-```json
-{
-  "name": "Consulta médica general",
-  "description": "Control clínico de rutina",
-  "duration": 30,
-  "price": 12000,
-  "category": "salud",
-  "available": true
-}
-```
-
-Formato de respuesta:
-
-```json
-{ "status": "success", "payload": {} }
-```
-
-```json
-{ "status": "error", "message": "Servicio con ID 99 no encontrado" }
-```
-
-## Scripts
-
-| Comando | Uso |
-| --- | --- |
-| `npm run dev` | Desarrollo con recarga automática (`node --watch`) |
-| `npm start` | Modo estándar |
+- [ ] Semana 1 - Recorrido por Node.js y estructura inicial
+- [ ] Semana 2 - Express y API REST
+- [ ] Semana 3 - FileSystem
+- [ ] Semana 4 - Routers y controllers
+- [ ] Semana 5 - Arquitectura en capas
+- [ ] Semana 6 - MongoDB y Mongoose
+- [ ] Semana 7 - Handlebars y WebSockets
+- [ ] Semana 8 - Consultas avanzadas
+- [ ] Semana 9 - Proyecto final

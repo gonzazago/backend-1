@@ -1,6 +1,17 @@
-import app from './app.js';
-import { config } from './config/env.config.js';
+import {config} from './config/config.js';
+import app from "./app.js";
 
-app.listen(config.PORT, () => {
-    console.log(`Server started on port ${config.PORT}, Bienvenidos a ${config.APP_NAME}`);
-});
+const port = config.PORT;
+
+(async () => {
+    try {
+        app.listen(port, () => {
+            console.log(`Server started on port ${port}`);
+        }).on('error', (err) => {
+            console.error(`Error init server: ${err.message}`);
+            process.exit(1);
+        })
+    } catch (err) {
+        console.error(`API can't start - ${err.message}`);
+    }
+})();
