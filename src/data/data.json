@@ -4,9 +4,9 @@
     "name": "Corte de Cabello Clásico",
     "description": "Corte personalizado con lavado y peinado incluido.",
     "duration": 45,
-    "price": 8500,
+    "price": 4000,
     "category": "Barbería",
-    "available": true
+    "available": false
   },
   {
     "id": "2",
@@ -42,6 +42,15 @@
     "duration": 60,
     "price": 11000,
     "category": "Manicuría",
+    "available": true
+  },
+  {
+    "id": "6",
+    "name": "Corte de Barba y Perfilado",
+    "description": "Perfilado con navaja tradicional y toalla caliente",
+    "duration": 30,
+    "price": 3500,
+    "category": "Barbería",
     "available": true
   }
 ]
