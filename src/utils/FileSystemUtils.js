@@ -6,7 +6,7 @@ export const readFile = async (path, encoding = 'utf8') => {
         const data = await fs.readFile(path, encoding);
         return JSON.parse(data);
     } catch (error) {
-        return error;
+        throw error;
     }
 }
 

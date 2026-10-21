@@ -1,18 +1,9 @@
-import {ServiceService} from "../service/service/ServiceService.js";
 import sendError from "../utils/sendError.js";
-import {ServiceFsDAO} from "../dao/ServiceFsDAO.js";
 
-
-if (process.env.NODE_ENV === "development") {
-    // const serviceRepository = new ServiceMongoDao();
-} else {
-    // const serviceRepository = new ServiceFsDAO();
-}
-const serviceRepository = new ServiceFsDAO();
 
 export class ServiceController {
-    constructor() {
-        this.service = new ServiceService(serviceRepository)
+    constructor(service) {
+        this.service = service
     }
 
     async getServices(req, res) {

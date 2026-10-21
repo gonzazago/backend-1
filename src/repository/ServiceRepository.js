@@ -1,4 +1,10 @@
 export class ServiceRepository {
+    handleError(message, statusCode = 500) {
+        const error = new Error(message);
+        error.statusCode = statusCode;
+        return error;
+    }
+
     async getServices() {
         throw new Error('Not implemented.');
     }

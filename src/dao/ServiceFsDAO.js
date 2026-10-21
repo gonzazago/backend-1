@@ -70,7 +70,7 @@ export class ServiceFsDAO extends ServiceRepository {
             const services = await this.getServices();
             const index = services.findIndex((s) => String(s.id) === String(id));
             if (index === -1) {
-                throw new Error(`Servicio con ID ${id} no encontrado`)
+                throw this.handleError(`Servicio con ID ${id} no encontrado`, 404);
             }
 
             services[index] = {
@@ -82,7 +82,7 @@ export class ServiceFsDAO extends ServiceRepository {
             await fs.writeFile(this.path, JSON.stringify(services, null, 2), 'utf-8');
             return services[index];
         } catch (error) {
-            console.error('Error agregando nuevo servicio', error);
+            console.error('Error actualizando servicio', error);
             throw error;
         }
     }
