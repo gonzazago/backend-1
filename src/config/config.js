@@ -9,4 +9,9 @@ export const config = {
     MONGO_DB_URI: process.env.MONGO_DB_URI || '',
 };
 
+
+if(!config.MONGO_DB_URI){
+    throw new Error("falta configurar MONGO_URI")
+}
+
 export default config;

@@ -1,107 +1,72 @@
-# Sistema backend de turnos y reservas
+# Sistema Backend de Turnos y Reservas
 
-API backend para gestionar servicios y reservas de turnos.
+API REST para gestionar los servicios que se pueden reservar. Hoy la
+persistencia de servicios es un archivo JSON; la API ya está separada en
+capas para poder cambiar cómo se guardan los datos sin reescribir las rutas.
 
----
+## Requisitos
 
-## Tecnologías
-
-- **Node.js** (v22.x LTS)
-- **Express**
-- **MongoDB Atlas** & **Mongoose**
-- **Socket.io**
-- **Zod**
-- **ES Modules (ESM)** con `import` / `export`
-
----
-
-## Requisitos previos
-
-- **Node.js** (versión 22 o superior): [Descargar Node.js](https://nodejs.org/en/download)
-  - Seleccionar sistema operativo: macOS (`.pkg`), Linux (`.xz`), Windows (`.exe`)
-- **npm** (incluido con Node.js)
-
----
+- Node.js 22 o superior
+- npm (incluido con Node.js)
 
 ## Instalación
 
-1. Clonar el repositorio o descargar el proyecto.
-2. Instalar las dependencias:
-
 ```bash
 npm install
-```
-
----
-
-## Variables de entorno
-
-Copiar o renombrar el archivo `.env_template` a `.env` y configurar los valores necesarios:
-
-```bash
 cp .env_template .env
 ```
 
-Ejemplo de configuración en `.env`:
-
-```env
-PORT=8080
-APP_NAME="SISTEMA BACKEND DE TURNOS Y RESERVA"
-ENV=DEV
-MONGO_DB_URI={{mongo_url}}
+```bash
+npm run dev
 ```
 
----
+Servidor en `http://localhost:8080`.
 
-## Scripts disponibles
+## Variables de entorno
 
-- **Iniciar en producción / modo estándar:**
-  ```bash
-  npm start
-  ```
-  Ejecuta `node src/server.js`.
+| Variable | Descripción |
+| --- | --- |
+| `PORT` | Puerto HTTP (default `8080`) |
+| `APP_NAME` | Nombre que se muestra al arrancar |
+| `ENV` | Entorno (`DEV`, `development`, etc.) |
+| `MONGO_DB_URI` | Reservada; todavía no se usa en esta versión |
 
-- **Iniciar en modo desarrollo (recarga automática):**
-  ```bash
-  npm run dev
-  ```
-  Ejecuta `node --watch src/server.js` para reiniciar el servidor automáticamente ante cambios.
+## Endpoints
 
-Por defecto, el servidor se iniciará en `http://localhost:8080/`.
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| GET | `/` | Salud / bienvenida |
+| GET | `/api/services` | Listar servicios |
+| GET | `/api/services/:id` | Obtener un servicio |
+| POST | `/api/services` | Crear un servicio |
+| PUT | `/api/services/:id` | Actualizar un servicio |
+| DELETE | `/api/services/:id` | Eliminar un servicio |
 
----
+`POST /api/services` espera `name`, `description`, `duration`, `price` y
+`category`. `available` es opcional (default `true`).
 
-## Estructura del proyecto
+## Arquitectura
 
-```text
-backend-turnos-reservas/
-├── .env_template          # Plantilla de variables de entorno
-├── package.json           # Metadatos del proyecto y scripts
-├── README.md              # Documentación del proyecto
-└── src/
-    ├── app.js             # Configuración principal de la aplicación
-    ├── server.js          # Punto de entrada y arranque del servidor HTTP
-    ├── config/            # Configuraciones (base de datos, entorno, etc.)
-    ├── controllers/       # Controladores de peticiones HTTP
-    ├── dao/               # Data Access Objects (capa de persistencia)
-    ├── middlewares/       # Middlewares de Express
-    ├── models/            # Modelos de datos / esquemas de Mongoose
-    ├── repositories/      # Capa de repositorios
-    ├── routes/            # Definición de rutas del sistema
-    ├── services/          # Lógica de negocio
-    └── utils/             # Funciones utilitarias y helpers
+```
+router → controller → service → repository → DAO (FileSystem)
 ```
 
----
+El controller no lee archivos. `ServiceFsDAO` implementa el contrato del
+repository y escribe `src/data/data.json`. Esa separación es la que permite
+cambiar la persistencia más adelante sin tocar las rutas.
 
-## Checklist del curso
+## Postman
 
-- [ ] Semana 1 - Recorrido por Node.js y estructura inicial
-- [ ] Semana 2 - Express y API REST
-- [ ] Semana 3 - FileSystem
-- [ ] Semana 4 - Routers y controllers
-- [ ] Semana 5 - Arquitectura en capas
-- [ ] Semana 6 - MongoDB y Mongoose
-- [ ] Semana 7 - Handlebars y WebSockets
-- [ ] Semana 8 - Consultas avanzadas
-- [ ] Semana 9 - Proyecto final
+Importar `postman/TurnosReservas-MongoDB.postman_collection.json` y
+`postman/TurnosReservas-MongoDB.postman_environment.json`.
+Seleccionar el environment **Turnos y Reservas — MongoDB**.
+
+Los POST de creación guardan el id en el environment. Las carpetas de
+reservas responden cuando ese recurso esté montado.
+
+## Scripts
+
+| Script | Comando |
+| --- | --- |
+| Desarrollo (watch) | `npm run dev` |
+| Producción | `npm start` |

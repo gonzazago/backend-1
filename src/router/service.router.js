@@ -1,10 +1,8 @@
 import { Router } from "express";
 import ServiceController from "../controllers/ServiceController.js";
 import { ServiceService } from "../service/service/ServiceService.js";
-import { ServiceFsDAO } from "../dao/ServiceFsDAO.js";
-
-// Inyección de dependencias: DAO -> Service -> Controller
-const repository = new ServiceFsDAO();
+import { ServiceMongoDAO } from "../dao/ServiceMongoDAO.js";
+const repository = new ServiceMongoDAO();
 const service = new ServiceService(repository);
 const serviceController = new ServiceController(service);
 
