@@ -1,3 +1,7 @@
+import ServiceSchema from "./service.js";
+import * as z from "zod";
+
+
 export class ServiceService {
     constructor(repository) {
         this.repository = repository;
@@ -13,9 +17,9 @@ export class ServiceService {
         return newError;
     }
 
-    async getServices() {
+    async getServices(filters) {
         try {
-            return await this.repository.getServices();
+            return await this.repository.getServices(filters);
         } catch (error) {
             console.error('Error getting services:', error);
             if (error.code === 'ENOENT') {
@@ -37,7 +41,15 @@ export class ServiceService {
     }
 
     async addService(data) {
-        const { name, description, duration, price, category, available = true } = data || {};
+        const {name, description, duration, price, category, available = true} = data || {};
+
+        try {
+            ServiceSchema.parse(data)
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                console.error('Error parsing service:', error.errors);
+            }
+        }
 
         if (!name || !description || duration === undefined || price === undefined || !category) {
             throw this.handleError(

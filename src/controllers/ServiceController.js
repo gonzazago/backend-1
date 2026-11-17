@@ -1,6 +1,7 @@
 import sendError from "../utils/sendError.js";
 
 
+
 export class ServiceController {
     constructor(service) {
         this.service = service
@@ -8,7 +9,21 @@ export class ServiceController {
 
     async getServices(req, res) {
         try {
-            const services = await this.service.getServices();
+            const {
+                category = '',
+                available = true,
+                page = 1,
+                limit = 2,
+                asc = 'asc'
+            } = req.query;
+            const filters = {
+                category: category,
+                available: available,
+                page: page || 1,
+                limit: limit || 10,
+                asc: false
+            }
+            const services = await this.service.getServices(filters);
             return res.status(200).json(services);
         } catch (err) {
             return sendError(res, err);
@@ -26,12 +41,14 @@ export class ServiceController {
 
     async addService(req, res) {
         try {
+            console.log(req.body);
             const newService = await this.service.addService(req.body);
             return res.status(201).json({
                 success: true,
                 message: 'Servicio creado exitosamente',
                 data: newService,
             });
+
         } catch (err) {
             return sendError(res, err);
         }

@@ -1,0 +1,55 @@
+<h2>Crear un nuevo servicio</h2>
+
+<form id="createForm" action="/api/services" method="POST">
+    <input type="text" name="name" placeholder="Nombre del servicio" required>
+    <input type="text" name="description" placeholder="Descripción.." required>
+    <input type="number" name="duration" placeholder="Duración.." required>
+    <input type="number" name="price" placeholder="Precio.." required>
+    <input type="text" name="category" placeholder="Categoría (futbol, tennis, pingpong, salud).." required>
+    <button type="submit">Guardar</button>
+</form>
+
+<div id="mensaje"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const form = document.getElementById('createForm')
+    const mensaje = document.getElementById('mensaje')
+    const socket = io();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const formData = new FormData(form)
+        const data = Object.fromEntries(formData.entries())
+
+        // Convertir campos numéricos
+        data.duration = Number(data.duration)
+        data.price = Number(data.price)
+
+        try {
+            const response = await fetch('/api/services', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            })
+            const result = await response.json()
+
+            if (response.ok) {
+                alert('Servicio creado exitosamente')
+                mensaje.innerHTML = `<p style="color: green;">${result.message}</p>`
+
+                //emitir un nuevo evento
+                socket.emit('servicesUpdated', {
+                    name: result.data.name,
+                    description: result.data.description,
+                });
+                form.reset()
+            } else {
+                alert('Hubo un error al validar los datos')
+                mensaje.innerHTML = `<p style="color: red;">${result.message}</p>`
+            }
+        } catch (err) {
+            mensaje.innerHTML = `<p style="color: red;">Se produjo un error al intentar crear el servicio</p>`
+        }
+    })
+</script>

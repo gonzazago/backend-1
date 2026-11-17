@@ -1,0 +1,20 @@
+<h1>Servicios disponibles - Real time</h1>
+<ul id="productList">
+    {{#each services}}
+        <li>
+            {{name}} - {{description}}
+        </li>
+    {{/each}}
+</ul>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    const list = document.getElementById('productList');
+    socket.on('servicesUpdated', (service) => {
+        const li = document.createElement('li');
+        li.textContent = `${service.name}: ${service.description}`;
+        list.appendChild(li);
+    })
+    ;</script>
