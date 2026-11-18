@@ -4,7 +4,7 @@ let categories = [
     "futbol",
     "tennis",
     "pingpong",
-    "salud"
+    "salud", "funcion"
 ]
 
 const serviceSchema = new mongoose.Schema({
@@ -15,7 +15,8 @@ const serviceSchema = new mongoose.Schema({
                 category: { type: String,
                     enum: categories,
                     required: true},
-                available: { type: Boolean, default: true}
+                available: { type: Boolean, default: true},
+                capacity: { type: Number, min: 1 } 
             },
             {
                 timestamps: true, versionKey: false

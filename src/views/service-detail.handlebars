@@ -1,0 +1,13 @@
+<p><a href="/services">← Volver al listado</a></p>
+
+{{#if error}}
+    <p>{{error}}</p>
+{{else}}
+    <article>
+        <h1>{{service.name}}</h1>
+        <p><strong>Descripción:</strong> {{service.description}}</p>
+        <p><strong>Duración:</strong> {{service.duration}} minutos</p>
+        <p><strong>Precio:</strong> ${{service.price}}</p>
+        <p><strong>Categoría:</strong> {{service.category}}</p>
+    </article>
+{{/if}}
